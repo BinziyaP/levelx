@@ -155,20 +155,35 @@
                     ->take(4)->get();
             @endphp
             @foreach($products as $product)
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group border border-gray-100 dark:border-gray-700 flex flex-col h-full">
                     @if($product->image)
-                        <div class="overflow-hidden">
-                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-48 object-cover transform group-hover:scale-110 transition duration-500">
+                        <div class="relative w-full pb-[100%] overflow-hidden bg-white p-4"> <!-- 1:1 Aspect Ratio Box with Padding -->
+                             <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="absolute top-0 left-0 w-full h-full object-contain transform group-hover:scale-105 transition duration-500">
                         </div>
                     @else
-                        <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500 dark:text-gray-400">No Image</span>
+                        <div class="w-full pb-[100%] bg-gray-100 dark:bg-gray-700 flex items-center justify-center relative">
+                            <span class="absolute text-gray-400 dark:text-gray-500 text-sm font-medium">No Image</span>
                         </div>
                     @endif
-                    <div class="p-6">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ $product->name }}</h3>
-                        <p class="text-indigo-600 font-bold text-xl">₹{{ $product->price }}</p>
-                        <a href="{{ route('shop') }}" class="mt-4 block w-full text-center bg-gray-900 text-white py-2 rounded-md hover:bg-indigo-600 transition-colors duration-300 shadow-md">View Details</a>
+                    <div class="p-5 flex flex-col flex-grow">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1 leading-tight line-clamp-2 h-12">{{ $product->name }}</h3>
+                        
+                        <!-- Mini Details -->
+                        <div class="flex items-center space-x-2 mb-3 text-xs text-gray-500 dark:text-gray-400">
+                            @if($product->brand)
+                                <span class="bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{{ $product->brand }}</span>
+                            @endif
+                            @if($product->category)
+                                <span>&bull;</span>
+                                <span>{{ $product->category->name }}</span>
+                            @endif
+                        </div>
+
+                        <div class="mt-auto flex items-center justify-between">
+                             <p class="text-indigo-600 font-bold text-xl">₹{{ number_format($product->price, 0) }}</p>
+                        </div>
+                        
+                        <a href="{{ route('shop') }}?search={{ urlencode($product->name) }}" class="mt-4 block w-full text-center bg-gray-900 dark:bg-indigo-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 dark:hover:bg-indigo-700 transition-colors duration-300">View Details</a>
                     </div>
                 </div>
             @endforeach

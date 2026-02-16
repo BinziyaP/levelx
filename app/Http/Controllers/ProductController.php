@@ -45,9 +45,16 @@ class ProductController extends Controller
     |--------------------------------------------------------------------------
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Show Create Form
+    |--------------------------------------------------------------------------
+    */
+
     public function create()
     {
-        return view('seller.products.create');
+        $categories = \App\Models\Category::all();
+        return view('seller.products.create', compact('categories'));
     }
 
     /*
@@ -64,6 +71,8 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image validation
+            'brand' => 'nullable|string|max:255',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $data = [
@@ -71,6 +80,8 @@ class ProductController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'price' => $request->price,
+            'brand' => $request->brand,
+            'category_id' => $request->category_id,
             'status' => 'pending'
         ];
 
@@ -96,7 +107,8 @@ class ProductController extends Controller
     public function edit($id)
     {
         $product = Product::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
-        return view('seller.products.edit', compact('product'));
+        $categories = \App\Models\Category::all();
+        return view('seller.products.edit', compact('product', 'categories'));
     }
 
     /*
@@ -113,12 +125,16 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'brand' => 'nullable|string|max:255',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $data = [
             'name' => $request->name,
             'description' => $request->description,
             'price' => $request->price,
+            'brand' => $request->brand,
+            'category_id' => $request->category_id,
         ];
 
         if ($request->hasFile('image')) {
@@ -146,20 +162,56 @@ class ProductController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | Buyer - View Approved Products Only
+    | Buyer - View Approved Products Only (With Search & Filter)
     |--------------------------------------------------------------------------
     */
 
-    public function shop()
+    public function shop(Request $request)
     {
-        // Show only approved products from active sellers
-        $products = Product::where('status', 'approved')
-            ->whereHas('user', function ($query) {
-                $query->where('status', 'active');
-            })
-            ->get();
+        $query = Product::where('status', 'approved')
+            ->whereHas('user', function ($q) {
+                $q->where('status', 'active');
+            });
 
-        return view('buyer.shop', compact('products'));
+        // 1. Search (Name or Brand)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('brand', 'like', "%{$search}%");
+            });
+        }
+
+        // 2. Category Filter
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // 3. Price Range Filter
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        // 4. Sorting
+        if ($request->filled('sort')) {
+            if ($request->sort === 'price_asc') {
+                $query->orderBy('price', 'asc');
+            } elseif ($request->sort === 'price_desc') {
+                $query->orderBy('price', 'desc');
+            } else {
+                $query->latest(); // Default
+            }
+        } else {
+            $query->latest(); // Default
+        }
+
+        $products = $query->paginate(12)->withQueryString();
+        $categories = \App\Models\Category::all();
+
+        return view('buyer.shop', compact('products', 'categories'));
     }
 
     /*
