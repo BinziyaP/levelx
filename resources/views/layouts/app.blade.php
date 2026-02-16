@@ -23,8 +23,14 @@
                     <div class="flex">
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
-                            <a href="{{ url('/') }}" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                                E-Shop
+                            <a href="{{ url('/') }}" class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" class="w-10 h-10 text-indigo-600">
+                                    <path d="M50 20 A30 30 0 1 0 80 50 H50 V40 H90 A40 40 0 1 1 50 10 C35 10 25 15 15 25 L25 35 C32 25 40 20 50 20 Z" />
+                                    <path d="M15 25 L5 15" stroke="currentColor" stroke-width="10" stroke-linecap="round" />
+                                    <circle cx="35" cy="85" r="6" />
+                                    <circle cx="65" cy="85" r="6" />
+                                </svg>
+                                <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight">eShopy</span>
                             </a>
                         </div>
 
@@ -71,8 +77,8 @@
                                 </div>
                             </div>
                         @else
-                            <a href="{{ route('login') }}" class="text-sm text-gray-700 dark:text-gray-500 underline">Log in</a>
-                            <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a>
+                            <a href="{{ route('login') }}" class="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2">Log in</a>
+                            <a href="{{ route('register') }}" class="ml-4 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md shadow-sm transition duration-150 ease-in-out">Register</a>
                         @endauth
                     </div>
                 </div>
