@@ -37,16 +37,7 @@ class OrderController extends Controller
             // Real Razorpay Order Creation
             $api = new Api($keyId, $keySecret);
             
-            // WORKAROUND: For Test Mode, if amount > 10,000 INR, cap it to 1 INR (100 paise)
-            // This prevents "Amount exceeds maximum amount allowed" errors in test mode.
-            $payableAmount = $total * 100;
-            $isTestMode = true; // Assuming we are in test mode based on context
-            
-            if ($payableAmount > 1000000) { // 10,000 INR
-                $razorpayAmount = 100; // 1 INR
-            } else {
-                $razorpayAmount = $payableAmount;
-            }
+            $razorpayAmount = $total * 100;
 
             $orderData = [
                 'receipt'         => 'rcptid_' . Str::random(10),
