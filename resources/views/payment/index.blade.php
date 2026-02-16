@@ -21,7 +21,7 @@
         "key": "{{ $key }}",
         "amount": "{{ $amount }}",
         "currency": "INR",
-        "name": "E-Shop",
+        "name": "eShopy",
         "description": "Payment for Order #{{ $order_id }}",
         "image": "https://example.com/your_logo",
         "order_id": "{{ $order_id }}", 

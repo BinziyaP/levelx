@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'E-Shop') }} - Seller</title>
+    <title>{{ config('app.name', 'eShopy') }} - Seller</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -20,7 +20,7 @@
         <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:block">
             <div class="h-full flex flex-col">
                 <div class="h-16 flex items-center justify-center border-b border-gray-200 dark:border-gray-700">
-                    <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">E-Shop Seller</h1>
+                    <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">eShopy Seller</h1>
                 </div>
                 <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
                     <a href="{{ route('seller.dashboard') }}" class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
@@ -56,7 +56,7 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <header class="h-16 flex items-center justify-between px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 md:hidden">
-                <span class="text-xl font-bold text-indigo-600 dark:text-indigo-400">E-Shop Seller</span>
+                <span class="text-xl font-bold text-indigo-600 dark:text-indigo-400">eShopy Seller</span>
                 <!-- Mobile menu button could go here -->
             </header>
 

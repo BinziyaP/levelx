@@ -23,6 +23,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Check Email (Client-side validation)
+Route::post('/check-email', [App\Http\Controllers\Auth\RegisteredUserController::class, 'checkEmail'])->name('check.email');
+
 // Shop Page (Protected)
 Route::get('/shop', [ProductController::class, 'shop'])
     ->name('shop')

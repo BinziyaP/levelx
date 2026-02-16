@@ -17,7 +17,7 @@
 <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900">
     <div class="min-h-screen">
         <!-- Navigation -->
-        <nav class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+        <nav class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex">
@@ -36,16 +36,16 @@
 
                         <!-- Navigation Links -->
                         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                            <a href="{{ url('/') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                            <a href="{{ url('/') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-600 dark:hover:border-indigo-400 focus:outline-none focus:text-indigo-600 focus:border-indigo-600 transition duration-150 ease-in-out">
                                 Home
                             </a>
-                            <a href="{{ url('/#about') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                            <a href="{{ url('/#about') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-600 dark:hover:border-indigo-400 focus:outline-none focus:text-indigo-600 focus:border-indigo-600 transition duration-150 ease-in-out">
                                 About Us
                             </a>
-                            <a href="{{ url('/#contact') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                            <a href="{{ url('/#contact') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-600 dark:hover:border-indigo-400 focus:outline-none focus:text-indigo-600 focus:border-indigo-600 transition duration-150 ease-in-out">
                                 Contact
                             </a>
-                            <a href="{{ route('shop') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                            <a href="{{ route('shop') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-600 dark:hover:border-indigo-400 focus:outline-none focus:text-indigo-600 focus:border-indigo-600 transition duration-150 ease-in-out">
                                 Products
                             </a>
                         </div>
@@ -58,6 +58,7 @@
                             @elseif(auth()->user()->role === 'seller')
                                 <a href="{{ route('seller.dashboard') }}" class="text-sm text-gray-700 dark:text-gray-500 underline mr-4">Dashboard</a>
                             @else
+                                <a href="{{ route('wishlist.index') }}" class="text-sm text-gray-700 dark:text-gray-500 underline mr-4">Wishlist</a>
                                 <a href="{{ route('orders.index') }}" class="text-sm text-gray-700 dark:text-gray-500 underline mr-4">My Orders</a>
                                 <a href="{{ route('cart.index') }}" class="text-sm text-gray-700 dark:text-gray-500 underline mr-4">
                                     Cart
@@ -77,8 +78,8 @@
                                 </div>
                             </div>
                         @else
-                            <a href="{{ route('login') }}" class="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2">Log in</a>
-                            <a href="{{ route('register') }}" class="ml-4 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md shadow-sm transition duration-150 ease-in-out">Register</a>
+                            <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 border-b-2 border-transparent text-sm font-medium leading-5 text-white bg-indigo-600 rounded-md hover:bg-white hover:text-indigo-600 hover:border-indigo-600 focus:outline-none focus:text-indigo-600 focus:border-indigo-600 transition duration-150 ease-in-out shadow-sm hover:shadow-none">Log in</a>
+                            <a href="{{ route('register') }}" class="ml-4 inline-flex items-center px-4 py-2 border-b-2 border-transparent text-sm font-medium leading-5 text-white bg-indigo-600 rounded-md hover:bg-white hover:text-indigo-600 hover:border-indigo-600 focus:outline-none focus:text-indigo-600 focus:border-indigo-600 transition duration-150 ease-in-out shadow-sm hover:shadow-none">Register</a>
                         @endauth
                     </div>
                 </div>
@@ -135,7 +136,7 @@
                     </div>
                     <div class="mt-4 md:mt-0 md:order-1">
                         <p class="text-center text-sm text-gray-400 dark:text-gray-500">
-                            &copy; {{ date('Y') }} E-Shop. All rights reserved.
+                            &copy; {{ date('Y') }} eShopy. All rights reserved.
                         </p>
                     </div>
                 </div>

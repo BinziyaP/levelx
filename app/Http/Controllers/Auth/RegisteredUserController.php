@@ -53,4 +53,18 @@ class RegisteredUserController extends Controller
 
         return redirect(RouteServiceProvider::HOME);
     }
+
+    /**
+     * Check if email is available.
+     */
+    public function checkEmail(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'string', 'email', 'max:255'],
+        ]);
+
+        $exists = User::where('email', $request->email)->exists();
+
+        return response()->json(['exists' => $exists]);
+    }
 }
