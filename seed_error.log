@@ -1,0 +1,31 @@
+
+   INFO  Seeding database.  
+
+  Database\Seeders\CategorySeeder  RUNNING  
+  Database\Seeders\CategorySeeder  16.28 ms DONE  
+
+  Database\Seeders\ProductSeeder  RUNNING  
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[42S22]: Column not found: 1054 Unknown column 'quantity' in 'field list' (SQL: insert into `products` (`user_id`, `category_id`, `name`, `description`, `price`, `quantity`, `status`, `image`, `condition`, `updated_at`, `created_at`) values (2, 1, iPhone 15 Pro, Experience the best features with iPhone 15 Pro. High quality and durable., 129000, 10, approved, default.png, new, 2026-02-17 14:41:43, 2026-02-17 14:41:43))
+
+  at C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:760
+    756▕         // If an exception occurs when attempting to run a query, we'll format the error
+    757▕         // message to include the bindings with SQL, which will make this exception a
+    758▕         // lot more helpful to the developer instead of just the database's errors.
+    759▕         catch (Exception $e) {
+  ➜ 760▕             throw new QueryException(
+    761▕                 $query, $this->prepareBindings($bindings), $e
+    762▕             );
+    763▕         }
+    764▕     }
+
+  i   A column was not found: You might have forgotten to run your database migrations. 
+      https://laravel.com/docs/master/migrations#running-migrations
+
+  1   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:539
+      PDOException::("SQLSTATE[42S22]: Column not found: 1054 Unknown column 'quantity' in 'field list'")
+
+  2   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:539
+      PDO::prepare("insert into `products` (`user_id`, `category_id`, `name`, `description`, `price`, `quantity`, `status`, `image`, `condition`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")

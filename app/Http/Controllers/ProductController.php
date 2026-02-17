@@ -70,6 +70,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric',
+            'quantity' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image validation
             'brand' => 'nullable|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
@@ -80,6 +81,7 @@ class ProductController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'price' => $request->price,
+            'quantity' => $request->quantity,
             'brand' => $request->brand,
             'category_id' => $request->category_id,
             'status' => 'pending'
@@ -124,6 +126,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric',
+            'quantity' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'brand' => 'nullable|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
@@ -133,6 +136,7 @@ class ProductController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'price' => $request->price,
+            'quantity' => $request->quantity,
             'brand' => $request->brand,
             'category_id' => $request->category_id,
         ];

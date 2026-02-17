@@ -1,0 +1,32 @@
+Warning: TTY mode is not supported on Windows platform.
+
+  [37;41;1m FAIL [39;49;22m[39m Tests\Unit\BundleDiscountServiceTest[39m
+  [32;1m✓[39;22m[39m [2mno discount for single item[22m[39m
+  [32;1m✓[39;22m[39m [2mbase discount only[22m[39m
+  [32;1m✓[39;22m[39m [2mbase plus category bonus[22m[39m
+  [31;1m⨯[39;22m[39m [2mdiscount cap[22m[39m
+
+  [2m---[22m
+
+  [31;1m• Tests\Unit\BundleDiscountServiceTest [39;22m> [31;1mdiscount cap[39;22m
+[39;1m  Failed asserting that 1500.0 matches expected 500.[39;22m
+
+  at [32mC:\Users\binziya\myproject\tests\Unit\BundleDiscountServiceTest.php[39m:[32m100[39m
+     96▕         ];
+     97▕ 
+     98▕         $result = $this->service->calculate($cart);
+     99▕ 
+  ➜ 100▕         $this->assertEquals(500, $result['discount_amount']);
+    101▕         $this->assertEquals(4500, $result['final_price']);
+    102▕         $this->assertTrue($result['discount_details']['is_capped']);
+    103▕     }
+    104▕ }
+
+  [33m1   [39m[39;1mC:\Users\binziya\myproject\vendor\phpunit\phpunit\phpunit[39;22m:[39;1m107[39;22m
+  [90m    PHPUnit\TextUI\Command::main()[39m
+  
+
+  [37;1mTests:  [39;22m[31;1m1 failed[39;22m[39m, [39m[32;1m3 passed[39;22m
+  [37;1mTime:   [39;22m[39m3.25s[39m
+
+

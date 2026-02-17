@@ -17,9 +17,8 @@ class MultipleOrdersRule implements RuleInterface
         // 1. Calculate Start Time
         $startTime = $order->created_at->copy()->subMinutes((int) $ruleConfig->time_window_minutes);
 
-        // 2. Count *previous* orders in the window (excluding current one)
+        // 2. Count total orders in the window (including current one)
         $count = Order::where('user_id', $order->user_id)
-            ->where('id', '!=', $order->id) // Exclude current order
             ->where('created_at', '>=', $startTime)
             ->where('created_at', '<=', $order->created_at)
             ->count();

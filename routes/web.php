@@ -208,4 +208,7 @@ Route::post('payment/callback', [App\Http\Controllers\OrderController::class, 'p
 Route::get('orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders.index')->middleware('auth');
 Route::get('orders/{id}/track', [App\Http\Controllers\OrderController::class, 'trackOrder'])->name('orders.track')->middleware('auth');
 
+
+
 require __DIR__.'/auth.php';
+

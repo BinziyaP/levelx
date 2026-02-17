@@ -35,6 +35,12 @@
                 <input type="number" name="price" id="price" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300" required>
             </div>
 
+            <!-- Quantity -->
+            <div>
+                <label for="quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Quantity</label>
+                <input type="number" name="quantity" id="quantity" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300" required>
+            </div>
+
             <!-- Brand -->
             <div>
                 <label for="brand" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Brand (Optional)</label>
