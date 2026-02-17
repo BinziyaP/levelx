@@ -160,6 +160,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     // Buyers (Orders)
     Route::get('/buyers', [AdminController::class, 'buyers'])->name('admin.buyers');
+    Route::get('/fraud-orders', [AdminController::class, 'fraudOrders'])->name('admin.orders.fraud');
+    Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('admin.orders.show');
     Route::post('/orders/{id}/approve', [AdminController::class, 'approveOrder'])->name('admin.orders.approve');
     Route::post('/orders/{id}/decline', [AdminController::class, 'declineOrder'])->name('admin.orders.decline');
     Route::delete('/orders/{id}', [AdminController::class, 'deleteOrder'])->name('admin.orders.delete');
@@ -169,6 +171,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('/products/{id}/approve', [AdminController::class, 'approveProduct'])->name('admin.products.approve');
     Route::post('/products/{id}/decline', [AdminController::class, 'declineProduct'])->name('admin.products.decline');
     Route::delete('/products/{id}', [AdminController::class, 'deleteProduct'])->name('admin.products.delete');
+
+    // Fraud Rules
+    Route::resource('fraud-rules', App\Http\Controllers\Admin\FraudRuleController::class);
 
 });
 

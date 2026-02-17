@@ -21,14 +21,22 @@
                             <div class="text-right">
                                 <span class="block text-xl font-bold text-indigo-600 dark:text-indigo-400">₹{{ number_format($order->total_price, 2) }}</span>
                                 <div class="mt-2 space-x-2">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $order->shipping_status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
-                                        {{ ucfirst($order->shipping_status) }}
-                                    </span>
-                                    @if(in_array($order->shipping_status, ['packed', 'shipped', 'delivered']))
-                                        <a href="{{ route('orders.track', $order->id) }}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            Track Order
-                                        </a>
+                                <div class="mt-2 space-x-2">
+                                    @if($order->is_suspicious)
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                            ⚠️ Under Review
+                                        </span>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $order->shipping_status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
+                                            {{ ucfirst($order->shipping_status) }}
+                                        </span>
+                                        @if(in_array($order->shipping_status, ['packed', 'shipped', 'delivered']))
+                                            <a href="{{ route('orders.track', $order->id) }}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                Track Order
+                                            </a>
+                                        @endif
                                     @endif
+                                </div>
                                 </div>
                             </div>
                         </div>

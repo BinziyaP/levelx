@@ -47,10 +47,29 @@ class AdminController extends Controller
         return view('admin.buyers', compact('orders'));
     }
 
+    public function fraudOrders()
+    {
+        $orders = \App\Models\Order::with('user')
+            ->where('is_suspicious', true)
+            ->latest()
+            ->get();
+        return view('admin.fraud.orders', compact('orders'));
+    }
+
+    public function showOrder($id)
+    {
+        $order = \App\Models\Order::with(['user', 'fraudLogs.rule'])->findOrFail($id);
+        return view('admin.orders.show', compact('order'));
+    }
+
     public function approveOrder($id)
     {
         $order = \App\Models\Order::findOrFail($id);
-        $order->update(['status' => 'approved']);
+        // Approve clears suspicion and sets status to approved
+        $order->update([
+            'status' => 'approved',
+            'is_suspicious' => false
+        ]);
         return redirect()->back()->with('success', 'Order accepted successfully.');
     }
 

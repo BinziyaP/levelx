@@ -90,8 +90,17 @@ class OrderController extends Controller
                 'items' => $cart,
                 'total_price' => $total,
                 'status' => 'paid',
-                'payment_id' => $input['razorpay_payment_id']
+                'payment_id' => $input['razorpay_payment_id'],
+                'ip_address' => $request->ip(),
             ]);
+
+            // Fraud Evaluation
+            try {
+                $fraudService = new \App\Services\Fraud\FraudScoringService();
+                $fraudService->evaluate($order);
+            } catch (\Exception $e) {
+                Log::error('Fraud Evaluation Error: ' . $e->getMessage());
+            }
 
             // Notify Sellers
             foreach ($cart as $id => $details) {
@@ -111,6 +120,10 @@ class OrderController extends Controller
             session()->forget('cart');
 
             DB::commit();
+
+            if ($order->is_suspicious) {
+                 return redirect()->route('orders.index')->with('warning', 'Your order is being reviewed for security verification.');
+            }
 
             return redirect()->route('orders.index')->with('success', 'Order placed successfully!');
 
