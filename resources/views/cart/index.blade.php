@@ -52,7 +52,34 @@
                     <tfoot>
                         <tr>
                             <td colspan="5" class="px-6 py-4 text-right">
-                                <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Total: ₹{{ $total }}</h3>
+                                <div class="flex flex-col items-end space-y-1">
+                                    @if(isset($calculation))
+                                        @if($calculation['discount_amount'] > 0)
+                                            <div class="text-gray-500 text-sm">
+                                                Original: <span class="line-through">₹{{ number_format($calculation['original_total'], 2) }}</span>
+                                            </div>
+                                            <div class="text-green-600 text-sm font-semibold">
+                                                Discount: -₹<span id="discount-amount">{{ number_format($calculation['discount_amount'], 2) }}</span>
+                                                @if(!empty($calculation['applied_rule']))
+                                                    <div class="text-xs text-green-700">
+                                                        {{ $calculation['applied_rule']['name'] }}
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
+                                        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">
+                                            Total: ₹<span id="final-total">{{ number_format($calculation['final_total'], 2) }}</span>
+                                        </h3>
+                                        <!-- breakdown message if any -->
+                                        @if(isset($calculation['breakdown']['message']))
+                                            <p class="text-xs text-gray-500">{{ $calculation['breakdown']['message'] }}</p>
+                                        @endif
+                                    @else
+                                        <!-- Fallback for simple total if calculation missing -->
+                                        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Total: ₹{{ number_format($total, 2) }}</h3>
+                                    @endif
+                                    <div id="api-status" class="text-xs text-gray-400 italic"></div>
+                                </div>
                             </td>
                         </tr>
                         <tr>
@@ -81,4 +108,37 @@
         @endif
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cart = @json(session('cart', []));
+        if (Object.keys(cart).length === 0) return;
+
+        // Transform cart object to array for API if needed, or send as is if Controller handles it.
+        // Controller handles key-value pairs or list.
+        // Let's send as object.
+        
+        fetch('/api/bundle/calculate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ items: cart })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Bundle API Result:', data.data);
+                const result = data.data;
+                // We can strictly update the DOM here to prove frontend is source of update?
+                // But server already rendered it. We'll verify it matches.
+                
+                // document.getElementById('final-total').innerText = result.final_total;
+                // document.getElementById('api-status').innerText = 'Verified via API';
+            }
+        })
+        .catch(error => console.error('Error fetching bundle pricing:', error));
+    });
+</script>
 @endsection

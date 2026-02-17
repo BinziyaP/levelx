@@ -19,6 +19,10 @@
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->created_at->format('d M Y, h:i A') }}</p>
                             </div>
                             <div class="text-right">
+                                @if($order->discount_amount > 0)
+                                    <span class="block text-sm text-gray-500 line-through">₹{{ number_format($order->original_price, 2) }}</span>
+                                    <span class="block text-xs text-green-600 font-semibold mb-1">Savings: ₹{{ number_format($order->discount_amount, 2) }}</span>
+                                @endif
                                 <span class="block text-xl font-bold text-indigo-600 dark:text-indigo-400">₹{{ number_format($order->total_price, 2) }}</span>
                                 <div class="mt-2 space-x-2">
                                 <div class="mt-2 space-x-2">

@@ -9,7 +9,8 @@ class HighCartValueRule implements RuleInterface
 {
     public function matches(Order $order, FraudRule $ruleConfig): bool
     {
-        return $order->total_price >= $ruleConfig->threshold_value;
+        $valueToCheck = $order->original_price ?? $order->total_price;
+        return $valueToCheck >= $ruleConfig->threshold_value;
     }
 
     public function getMessage(): string

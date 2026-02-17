@@ -8,6 +8,7 @@ use App\Models\FraudLog;
 use App\Services\Fraud\Rules\HighCartValueRule;
 use App\Services\Fraud\Rules\MultipleOrdersRule;
 use App\Services\Fraud\Rules\SameIPRule;
+use App\Services\Fraud\Rules\HighDiscountRule;
 use Illuminate\Support\Facades\Log;
 
 class FraudScoringService
@@ -16,6 +17,7 @@ class FraudScoringService
         'cart_value' => HighCartValueRule::class,
         'multiple_orders' => MultipleOrdersRule::class,
         'same_ip' => SameIPRule::class,
+        'high_discount' => HighDiscountRule::class,
     ];
 
     public function evaluate(Order $order)

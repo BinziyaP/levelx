@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        // specific logic removed to unblock migration queue
-        // condition column removal handled or skipped manually
+        Schema::table('products', function (Blueprint $table) {
+            $table->integer('quantity')->default(0)->after('price');
+        });
     }
 
     /**
@@ -25,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->string('condition')->nullable();
+            $table->dropColumn('quantity');
         });
     }
 };

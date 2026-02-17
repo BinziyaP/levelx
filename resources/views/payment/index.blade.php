@@ -14,6 +14,24 @@
             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                 Please wait while we initialize the secure payment gateway.
             </p>
+            
+            <div class="mt-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-2">
+                <h3 class="font-bold text-gray-900 dark:text-gray-100">Payment Summary</h3>
+                <div class="flex justify-between text-gray-600 dark:text-gray-400">
+                    <span>Order Total:</span>
+                    <span>₹{{ number_format($original_total ?? $total, 2) }}</span>
+                </div>
+                @if(isset($discount_amount) && $discount_amount > 0)
+                <div class="flex justify-between text-green-600 font-medium">
+                    <span>Bundle Discount ({{ $applied_rule['name'] ?? 'Applied' }}):</span>
+                    <span>-₹{{ number_format($discount_amount, 2) }}</span>
+                </div>
+                @endif
+                <div class="flex justify-between text-xl font-bold text-gray-900 dark:text-white border-t pt-2">
+                    <span>Payable Amount:</span>
+                    <span>₹{{ number_format($total, 2) }}</span>
+                </div>
+            </div>
         </div>
         
         <div class="mt-8">

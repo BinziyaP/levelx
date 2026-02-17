@@ -175,6 +175,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Fraud Rules
     Route::resource('fraud-rules', App\Http\Controllers\Admin\FraudRuleController::class);
 
+    // Bundle Rules
+    Route::resource('bundle-rules', App\Http\Controllers\Admin\BundleRuleController::class);
+
 });
 
 

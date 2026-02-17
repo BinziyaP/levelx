@@ -13,8 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        // specific logic removed to unblock migration queue
-        // condition column removal handled or skipped manually
+        Schema::table('orders', function (Blueprint $table) {
+            $table->decimal('original_price', 10, 2)->after('total_price')->nullable();
+            $table->decimal('discount_amount', 10, 2)->after('original_price')->default(0);
+        });
     }
 
     /**
@@ -24,8 +26,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->string('condition')->nullable();
+        Schema::table('orders', function (Blueprint $table) {
+            //
         });
     }
 };

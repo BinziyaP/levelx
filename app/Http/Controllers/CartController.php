@@ -10,7 +10,11 @@ class CartController extends Controller
     public function index()
     {
         $cart = session()->get('cart', []);
-        return view('cart.index', compact('cart'));
+        
+        $bundleService = new \App\Services\BundleDiscountService();
+        $calculation = $bundleService->calculate($cart);
+
+        return view('cart.index', compact('cart', 'calculation'));
     }
 
     public function add($id)
@@ -30,6 +34,14 @@ class CartController extends Controller
         }
 
         session()->put('cart', $cart);
+
+        if(auth()->check()) {
+            \App\Models\Cart::updateOrCreate(
+                ['user_id' => auth()->id()],
+                ['items' => $cart]
+            );
+        }
+
         return redirect()->back()->with('success', 'Product added to cart successfully!');
     }
 
@@ -40,6 +52,13 @@ class CartController extends Controller
             if(isset($cart[$request->id])) {
                 unset($cart[$request->id]);
                 session()->put('cart', $cart);
+
+                if(auth()->check()) {
+                    \App\Models\Cart::updateOrCreate(
+                        ['user_id' => auth()->id()],
+                        ['items' => $cart]
+                    );
+                }
             }
             session()->flash('success', 'Product removed successfully');
         }

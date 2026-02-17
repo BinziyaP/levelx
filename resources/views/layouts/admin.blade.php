@@ -38,6 +38,9 @@
                     <a href="{{ route('fraud-rules.index') }}" class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
                         Fraud Rules
                     </a>
+                    <a href="{{ route('bundle-rules.index') }}" class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                        Bundle Rules
+                    </a>
                     <a href="{{ route('admin.orders.fraud') }}" class="flex items-center px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-md font-medium">
                         ⚠️ Fraud Orders
                     </a>

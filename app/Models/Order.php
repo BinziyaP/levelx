@@ -26,6 +26,8 @@ class Order extends Model
         'fraud_score',
         'is_suspicious',
         'ip_address',
+        'original_price',
+        'discount_amount',
     ];
 
     protected $casts = [

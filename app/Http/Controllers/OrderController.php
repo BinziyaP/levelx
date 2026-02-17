@@ -21,10 +21,11 @@ class OrderController extends Controller
                 return redirect()->back()->with('error', 'Your cart is empty!');
             }
 
-            $total = 0;
-            foreach ($cart as $item) {
-                $total += $item['price'] * $item['quantity'];
-            }
+            // Calculate Bundle Discount
+            $bundleService = new \App\Services\BundleDiscountService();
+            $calculation = $bundleService->calculate($cart);
+            
+            $finalTotal = $calculation['final_total']; // This is in INR
 
             // Check if Razorpay keys are set
             $keyId = env('RAZORPAY_KEY_ID');
@@ -37,7 +38,7 @@ class OrderController extends Controller
             // Real Razorpay Order Creation
             $api = new Api($keyId, $keySecret);
             
-            $razorpayAmount = $total * 100;
+            $razorpayAmount = $finalTotal * 100; // Convert to paise
 
             $orderData = [
                 'receipt'         => 'rcptid_' . Str::random(10),
@@ -48,12 +49,25 @@ class OrderController extends Controller
 
             $razorpayOrder = $api->order->create($orderData);
 
+            // Create Cart Snapshot
+            $snapshotService = new \App\Services\CartSnapshotService();
+            $snapshotService->createSnapshot(
+                auth()->id(),
+                $cart,
+                $calculation,
+                $razorpayOrder['id'],
+                $calculation['applied_rule'] ? [$calculation['applied_rule']] : []
+            );
+
             return view('payment.index', [
                 'order_id' => $razorpayOrder['id'],
                 'amount' => $razorpayAmount, // Send the actual payable amount to the view (100 paise)
                 'key' => $keyId,
                 'cart' => $cart,
-                'total' => $total // Keep the visual total as the real cart total
+                'total' => $finalTotal, // Show the final discounted total
+                'original_total' => $calculation['original_total'],
+                'discount_amount' => $calculation['discount_amount'],
+                'applied_rule' => $calculation['applied_rule']
             ]);
 
         } catch (\Exception $e) {
@@ -77,18 +91,38 @@ class OrderController extends Controller
             $api->utility->verifyPaymentSignature($attributes);
 
             // Payment Successful - Create Order
-            $cart = session()->get('cart');
-            $total = 0;
-            foreach ($cart as $item) {
-                $total += $item['price'] * $item['quantity'];
+            
+            // Try to find snapshot first (New Flow)
+            $snapshotService = new \App\Services\CartSnapshotService();
+            $snapshot = $snapshotService->getSnapshotByRazorpayId($input['razorpay_order_id']);
+
+            if ($snapshot) {
+                $items = $snapshot->items;
+                $finalTotal = $snapshot->final_total;
+                $originalTotal = $snapshot->original_total;
+                $discountAmount = $snapshot->discount_amount;
+            } else {
+                // Fallback for backward compatibility (or if snapshot missing)
+                $items = session()->get('cart');
+                if (!$items) {
+                    throw new \Exception("Cart session expired and no snapshot found.");
+                }
+                $finalTotal = 0;
+                foreach ($items as $item) {
+                    $finalTotal += $item['price'] * $item['quantity'];
+                }
+                $originalTotal = $finalTotal;
+                $discountAmount = 0;
             }
 
             DB::beginTransaction();
 
             $order = Order::create([
                 'user_id' => auth()->id(),
-                'items' => $cart,
-                'total_price' => $total,
+                'items' => $items,
+                'total_price' => $finalTotal,
+                'original_price' => $originalTotal,
+                'discount_amount' => $discountAmount,
                 'status' => 'paid',
                 'payment_id' => $input['razorpay_payment_id'],
                 'ip_address' => $request->ip(),
@@ -103,7 +137,7 @@ class OrderController extends Controller
             }
 
             // Notify Sellers
-            foreach ($cart as $id => $details) {
+            foreach ($items as $id => $details) {
                 $product = \App\Models\Product::find($id);
                 if ($product && $product->user) {
                     $product->user->notify(new \App\Notifications\PaymentReceived([
