@@ -35,19 +35,33 @@ class OrderController extends Controller
                 return redirect()->back()->with('error', 'Razorpay Keys are missing. Please configure .env file.');
             }
 
-            // Real Razorpay Order Creation
-            $api = new Api($keyId, $keySecret);
+            // Real Razorpay Order Creation (Using HTTP Client to avoid SDK timeout issues)
+            // $api = new Api($keyId, $keySecret);
             
             $razorpayAmount = $finalTotal * 100; // Convert to paise
-
+            
             $orderData = [
                 'receipt'         => 'rcptid_' . Str::random(10),
                 'amount'          => $razorpayAmount, 
                 'currency'        => 'INR',
                 'payment_capture' => 1 // Auto capture
             ];
+            
+            // $razorpayOrder = $api->order->create($orderData);
 
-            $razorpayOrder = $api->order->create($orderData);
+            $response = \Illuminate\Support\Facades\Http::withBasicAuth($keyId, $keySecret)
+                ->withOptions([
+                    'connect_timeout' => 30,
+                    'timeout' => 60,
+                    'force_ip_resolve' => 'v4'
+                ])
+                ->post('https://api.razorpay.com/v1/orders', $orderData);
+
+            if ($response->failed()) {
+                throw new \Exception('Razorpay Error: ' . $response->body());
+            }
+
+            $razorpayOrder = $response->json();
 
             // Create Cart Snapshot
             $snapshotService = new \App\Services\CartSnapshotService();
