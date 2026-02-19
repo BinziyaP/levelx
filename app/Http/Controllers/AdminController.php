@@ -8,7 +8,45 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        return view('admin.dashboard');
+        // 1. Global Metrics
+        // Revenue (All time, 30 days, 7 days)
+        $totalRevenue = \App\Models\ProductSalesHistory::sum('revenue');
+        $revenue30Days = \App\Models\ProductSalesHistory::where('recorded_at', '>=', now()->subDays(30))->sum('revenue');
+        $revenue7Days = \App\Models\ProductSalesHistory::where('recorded_at', '>=', now()->subDays(7))->sum('revenue');
+
+        // Total Units Sold
+        $totalUnitsSold = \App\Models\ProductSalesHistory::sum('quantity');
+
+        // Average Platform Rating & Total Reviews
+        // "Using existing: product_rating_history" - we can take the latest snapshot or just use Products table for current state.
+        // Products table is more efficient for "Current State". 
+        $avgRating = \App\Models\Product::avg('average_rating');
+        $totalReviews = \App\Models\Product::sum('total_reviews');
+
+        // 2. Top 5 Best Selling Products (By Revenue)
+        $topSellingProducts = \App\Models\ProductSalesHistory::selectRaw('product_id, sum(revenue) as total_revenue, sum(quantity) as total_units')
+            ->groupBy('product_id')
+            ->orderByDesc('total_revenue')
+            ->with(['product']) // Ensure product relationship exists
+            ->take(5)
+            ->get();
+
+        // 3. Top 5 Highest Rated Products
+        $topRatedProducts = \App\Models\Product::orderByDesc('average_rating')
+            ->orderByDesc('total_reviews')
+            ->take(5)
+            ->get();
+
+        // 4. All Products Sorted by Ranking Score
+        $rankedProducts = \App\Models\Product::with('user')
+            ->orderByDesc('ranking_score')
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'totalRevenue', 'revenue30Days', 'revenue7Days', 
+            'totalUnitsSold', 'avgRating', 'totalReviews',
+            'topSellingProducts', 'topRatedProducts', 'rankedProducts'
+        ));
     }
 
     // Sellers

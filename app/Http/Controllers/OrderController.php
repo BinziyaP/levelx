@@ -167,6 +167,11 @@ class OrderController extends Controller
 
             session()->forget('cart');
 
+            // Also clear the persistent cart from database
+            if (auth()->check()) {
+                \App\Models\Cart::where('user_id', auth()->id())->delete();
+            }
+
             DB::commit();
 
             if ($order->is_suspicious) {

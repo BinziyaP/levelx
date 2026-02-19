@@ -21,6 +21,12 @@ class EventServiceProvider extends ServiceProvider
         \Illuminate\Auth\Events\Login::class => [
             \App\Listeners\MergeCartOnLogin::class,
         ],
+        \App\Events\ReviewSubmitted::class => [
+            \App\Listeners\HandleReviewSubmission::class,
+        ],
+        \App\Events\OrderCompleted::class => [
+            \App\Listeners\HandleOrderCompletion::class,
+        ],
     ];
 
     /**

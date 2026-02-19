@@ -46,6 +46,7 @@
                 <div class="mb-4">
                     <label for="sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sort By</label>
                     <select name="sort" id="sort" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
+                        <option value="recommended" {{ request('sort') == 'recommended' || !request('sort') ? 'selected' : '' }}>Recommended</option>
                         <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Latest</option>
                         <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
                         <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
@@ -104,6 +105,18 @@
                                         @endif
                                     </div>
                                     <h3 class="text-base font-bold text-gray-900 dark:text-white leading-snug line-clamp-2 h-10 group-hover:text-indigo-600 transition-colors">{{ $product->name }}</h3>
+                                    
+                                    <!-- Rating -->
+                                    <div class="flex items-center mt-1 mb-2">
+                                        <div class="flex items-center text-yellow-400 text-xs">
+                                            @for($i=1; $i<=5; $i++)
+                                                <svg class="h-3 w-3 fill-current {{ $i <= round($product->avg_rating) ? 'text-yellow-400' : 'text-gray-300' }}" viewBox="0 0 24 24">
+                                                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                                </svg>
+                                            @endfor
+                                        </div>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-1">({{ $product->total_reviews }})</span>
+                                    </div>
                                 </div>
                                 
                                 <p class="text-gray-500 dark:text-gray-400 text-sm mb-4 line-clamp-2 h-10">{{ Str::limit($product->description, 80) }}</p>

@@ -44,6 +44,12 @@
                     <a href="{{ route('admin.orders.fraud') }}" class="flex items-center px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-md font-medium">
                         ⚠️ Fraud Orders
                     </a>
+                    <a href="{{ route('admin.ranking-settings.index') }}" class="flex items-center px-4 py-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900 rounded-md">
+                        📊 Ranking Settings
+                    </a>
+                    <a href="{{ route('admin.returns.index') }}" class="flex items-center px-4 py-2 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900 rounded-md">
+                        ↩️ Returns & Refunds
+                    </a>
                 </nav>
                 <div class="p-4 border-t border-gray-200 dark:border-gray-700">
                     <form method="POST" action="{{ route('logout') }}">

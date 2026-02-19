@@ -55,6 +55,10 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     @if(isset($notification->data['internal_order_id']))
+                                        @php
+                                            $orderExists = \App\Models\Order::where('id', $notification->data['internal_order_id'])->exists();
+                                        @endphp
+                                        @if($orderExists)
                                         <div x-data="{ open: false, status: 'pending' }">
                                             <button @click="open = true" class="text-indigo-600 hover:text-indigo-900">Update Shipping</button>
 
@@ -126,6 +130,9 @@
                 Track
             </a>
         @endif
+                                        @else
+                                            <span class="text-xs text-red-400 font-medium">Order Deleted</span>
+                                        @endif
                                     @else
                                         <span class="text-xs text-gray-400">Order ID N/A</span>
                                     @endif

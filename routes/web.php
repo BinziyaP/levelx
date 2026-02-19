@@ -31,6 +31,9 @@ Route::get('/shop', [ProductController::class, 'shop'])
     ->name('shop')
     ->middleware('auth');
 
+// Product Details (Public or Auth? Project seems mixed. Let's make it public but view uses auth checks)
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -178,6 +181,16 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Bundle Rules
     Route::resource('bundle-rules', App\Http\Controllers\Admin\BundleRuleController::class);
 
+    // Order Ranking Settings
+    Route::get('/ranking-settings', [App\Http\Controllers\Admin\RankingSettingsController::class, 'index'])->name('admin.ranking-settings.index');
+    Route::post('/ranking-settings', [App\Http\Controllers\Admin\RankingSettingsController::class, 'update'])->name('admin.ranking-settings.update');
+
+    // Returns Management
+    Route::get('/returns', [App\Http\Controllers\Admin\ReturnController::class, 'index'])->name('admin.returns.index');
+    Route::post('/returns/{return}/approve', [App\Http\Controllers\Admin\ReturnController::class, 'approve'])->name('admin.returns.approve');
+    Route::post('/returns/{return}/reject', [App\Http\Controllers\Admin\ReturnController::class, 'reject'])->name('admin.returns.reject');
+
+
 });
 
 
@@ -210,6 +223,13 @@ Route::post('checkout', [App\Http\Controllers\OrderController::class, 'checkout'
 Route::post('payment/callback', [App\Http\Controllers\OrderController::class, 'paymentCallback'])->name('payment.callback')->middleware('auth');
 Route::get('orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders.index')->middleware('auth');
 Route::get('orders/{id}/track', [App\Http\Controllers\OrderController::class, 'trackOrder'])->name('orders.track')->middleware('auth');
+
+// Product Reviews
+Route::post('/products/{product}/review', [App\Http\Controllers\ProductReviewController::class, 'store'])->name('products.review.store')->middleware('auth');
+
+// Order Returns (Customer)
+Route::post('/orders/{order}/return', [App\Http\Controllers\OrderReturnController::class, 'store'])->name('orders.return.store')->middleware('auth');
+Route::post('/orders/{order}/claim-refund', [App\Http\Controllers\OrderReturnController::class, 'claimRefund'])->name('orders.claim-refund')->middleware('auth');
 
 
 

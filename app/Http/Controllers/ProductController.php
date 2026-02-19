@@ -22,8 +22,23 @@ class ProductController extends Controller
         $pendingProducts = (clone $products)->where('status', 'pending')->count();
         $declinedProducts = (clone $products)->where('status', 'declined')->count();
         $notifications = Auth::user()->notifications;
+        
+        // Analytics
+        $sellerRevenue = \App\Models\ProductSalesHistory::join('products', 'product_sales_history.product_id', '=', 'products.id')
+            ->where('products.user_id', Auth::id())
+            ->sum('product_sales_history.revenue');
 
-        return view('seller.dashboard', compact('totalProducts', 'approvedProducts', 'pendingProducts', 'declinedProducts', 'notifications'));
+        $sellerUnitsSold = \App\Models\ProductSalesHistory::join('products', 'product_sales_history.product_id', '=', 'products.id')
+            ->where('products.user_id', Auth::id())
+            ->sum('product_sales_history.quantity');
+
+        $sellerAvgRating = $products->avg('average_rating');
+        $sellerTotalReviews = $products->sum('total_reviews');
+
+        return view('seller.dashboard', compact(
+            'totalProducts', 'approvedProducts', 'pendingProducts', 'declinedProducts', 'notifications',
+            'sellerRevenue', 'sellerUnitsSold', 'sellerAvgRating', 'sellerTotalReviews'
+        ));
     }
 
     /*
@@ -205,17 +220,78 @@ class ProductController extends Controller
                 $query->orderBy('price', 'asc');
             } elseif ($request->sort === 'price_desc') {
                 $query->orderBy('price', 'desc');
+            } elseif ($request->sort === 'recommended') {
+                $query->orderBy('ranking_score', 'desc');
             } else {
-                $query->latest(); // Default
+                $query->latest(); // Default for 'latest'
             }
         } else {
-            $query->latest(); // Default
+            $query->orderBy('ranking_score', 'desc'); // Smart Ranking Default
         }
 
         $products = $query->paginate(12)->withQueryString();
         $categories = \App\Models\Category::all();
 
         return view('buyer.shop', compact('products', 'categories'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Show Single Product Details
+    |--------------------------------------------------------------------------
+    */
+    public function show($id)
+    {
+        $product = Product::with(['reviews.user', 'category', 'user'])->findOrFail($id);
+        
+        // Calculate rating distribution
+        $ratings = [
+            5 => $product->reviews->where('rating', 5)->count(),
+            4 => $product->reviews->where('rating', 4)->count(),
+            3 => $product->reviews->where('rating', 3)->count(),
+            2 => $product->reviews->where('rating', 2)->count(),
+            1 => $product->reviews->where('rating', 1)->count(),
+        ];
+        $totalReviews = $product->reviews->count();
+
+        // Check if current user bought this product (for review permission)
+        $canReview = false;
+        if (Auth::check()) {
+            $user = Auth::user();
+            // Check if already reviewed
+            $alreadyReviewed = $product->reviews->where('user_id', $user->id)->count() > 0;
+            
+            if (!$alreadyReviewed) {
+                 // Check if purchased
+                 // Dynamic Status Requirement
+                 $settings = \DB::table('ranking_settings')->first();
+                 $allowedOrderStatuses = ['completed', 'delivered', 'approved', 'paid'];
+                 $allowedShippingStatuses = ['delivered'];
+                 if ($settings && $settings->allow_early_reviews) {
+                     $allowedOrderStatuses = array_merge($allowedOrderStatuses, ['processing']);
+                     $allowedShippingStatuses = array_merge($allowedShippingStatuses, ['packed', 'shipped']);
+                 }
+
+                 // Check both order status AND shipping_status columns
+                 $canReview = \App\Models\Order::where('user_id', $user->id)
+                    ->where(function ($query) use ($allowedOrderStatuses, $allowedShippingStatuses) {
+                        $query->whereIn('status', $allowedOrderStatuses)
+                              ->orWhereIn('shipping_status', $allowedShippingStatuses);
+                    })
+                    ->get()
+                    ->contains(function ($order) use ($product) {
+                        $items = is_string($order->items) ? json_decode($order->items, true) : $order->items;
+                        if (!$items) return false;
+                        foreach ($items as $key => $item) {
+                             $itemId = $item['product_id'] ?? $item['id'] ?? $key;
+                             if ($itemId == $product->id) return true;
+                        }
+                        return false;
+                    });
+            }
+        }
+
+        return view('buyer.product_details', compact('product', 'ratings', 'totalReviews', 'canReview'));
     }
 
     /*
@@ -260,7 +336,11 @@ class ProductController extends Controller
             'courier_code' => 'nullable|string|in:' . implode(',', array_keys(config('couriers'))),
         ]);
 
-        $order = \App\Models\Order::findOrFail($id);
+        $order = \App\Models\Order::find($id);
+
+        if (!$order) {
+            return redirect()->back()->with('error', 'Order not found. It may have been deleted or cancelled.');
+        }
 
         // Security Check: Ideally ensure the order contains products from this seller.
         // For this implementation, we'll assume valid access if notification exists, 
@@ -324,8 +404,23 @@ class ProductController extends Controller
 
         $order->save();
 
-        // Update the notification data to reflect the new status (optional but good for UI consistency if relying on notification data)
-        // Find notification related to this order for this user
+        // Recalculate ranking scores for all products in this order
+        try {
+            $rankingService = app(\App\Services\ProductRankingService::class);
+            $items = is_string($order->items) ? json_decode($order->items, true) : $order->items;
+            if (is_array($items)) {
+                foreach ($items as $key => $item) {
+                    $pid = $item['product_id'] ?? $item['id'] ?? $key;
+                    if ($pid) {
+                        $rankingService->updateProductStats($pid);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Ranking update error: ' . $e->getMessage());
+        }
+
+        // Update the notification data to reflect the new status
         $user = Auth::user();
         foreach($user->notifications as $notification) {
             if (isset($notification->data['internal_order_id']) && $notification->data['internal_order_id'] == $id) {
@@ -343,8 +438,12 @@ class ProductController extends Controller
     }
     public function trackOrder($id)
     {
-        $order = \App\Models\Order::findOrFail($id);
-        
+        $order = \App\Models\Order::find($id);
+
+        if (!$order) {
+            return redirect()->route('seller.orders')->with('error', 'Order not found. It may have been deleted or cancelled.');
+        }
+
         // Check if current user is the seller (simplified check)
         if (Auth::user()->role !== 'seller') {
             abort(403);

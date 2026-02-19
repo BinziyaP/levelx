@@ -24,6 +24,7 @@ class BundleDiscountService
     {
         $originalTotal = 0;
         $totalItems = 0;
+        $uniqueProducts = 0;
         $uniqueCategories = [];
         
         // 1. Calculate Baselines
@@ -40,25 +41,28 @@ class BundleDiscountService
                 $uniqueCategories[$products[$id]->category_id] = true;
             } else {
                 // Fallback or skip if product invalid (e.g. deleted)
-                // For now, continue but maybe log?
                 $price = $item['price'] ?? 0; 
             }
             
             $originalTotal += $price * $qty;
             $totalItems += $qty;
+            $uniqueProducts++;
         }
         
         $uniqueCategoryCount = count($uniqueCategories);
 
-        // 2. Strict Limits Validation (2-6 items)
-        if ($totalItems < 2 || $totalItems > 6) {
+        // 2. Strict Limits Validation
+        // Bundle discount requires at least 2 DIFFERENT products (not duplicates of the same)
+        if ($uniqueProducts < 2 || $totalItems < 2 || $totalItems > 6) {
             return [
                 'original_total' => round($originalTotal, 2),
                 'discount_amount' => 0.00,
                 'final_total' => round($originalTotal, 2),
-                'applied_rule' => null, // No rule applied
+                'applied_rule' => null,
                 'breakdown' => [
-                    'message' => 'Bundle must contain between 2 and 6 items.'
+                    'message' => $uniqueProducts < 2 
+                        ? 'Bundle discount requires at least 2 different products.' 
+                        : 'Bundle must contain between 2 and 6 items.'
                 ]
             ];
         }

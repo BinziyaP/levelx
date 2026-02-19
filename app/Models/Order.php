@@ -43,6 +43,11 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function returnRequest()
+    {
+        return $this->hasOne(OrderReturn::class);
+    }
+
     public function fraudLogs()
     {
         return $this->hasMany(FraudLog::class);

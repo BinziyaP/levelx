@@ -13,17 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('cart_snapshots', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->json('items');
-            $table->decimal('original_total', 10, 2);
-            $table->decimal('discount_amount', 10, 2)->default(0);
-            $table->decimal('final_total', 10, 2);
-            $table->string('razorpay_order_id')->unique();
-            $table->json('applied_rules')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('cart_snapshots')) {
+            Schema::create('cart_snapshots', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->json('items');
+                $table->decimal('original_total', 10, 2);
+                $table->decimal('discount_amount', 10, 2)->default(0);
+                $table->decimal('final_total', 10, 2);
+                $table->string('razorpay_order_id')->unique();
+                $table->json('applied_rules')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
