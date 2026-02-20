@@ -106,6 +106,11 @@ Route::middleware(['auth'])->prefix('seller')->group(function () {
     Route::post('/notifications/{id}/read', [ProductController::class, 'markNotificationAsRead'])
         ->name('seller.notifications.read');
 
+    // Seller Returns/Disputes
+    Route::get('/returns', [App\Http\Controllers\Seller\ReturnController::class, 'index'])->name('seller.returns.index');
+    Route::get('/returns/{return}', [App\Http\Controllers\Seller\ReturnController::class, 'show'])->name('seller.returns.show');
+    Route::post('/returns/{return}/respond', [App\Http\Controllers\Seller\ReturnController::class, 'respond'])->name('seller.returns.respond');
+
     // Seller Products List
     Route::get('/products', [ProductController::class, 'index'])
         ->name('products.index');
@@ -185,11 +190,11 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/ranking-settings', [App\Http\Controllers\Admin\RankingSettingsController::class, 'index'])->name('admin.ranking-settings.index');
     Route::post('/ranking-settings', [App\Http\Controllers\Admin\RankingSettingsController::class, 'update'])->name('admin.ranking-settings.update');
 
-    // Returns Management
-    Route::get('/returns', [App\Http\Controllers\Admin\ReturnController::class, 'index'])->name('admin.returns.index');
-    Route::post('/returns/{return}/approve', [App\Http\Controllers\Admin\ReturnController::class, 'approve'])->name('admin.returns.approve');
-    Route::post('/returns/{return}/reject', [App\Http\Controllers\Admin\ReturnController::class, 'reject'])->name('admin.returns.reject');
-
+    // Disputes Management
+    Route::get('/disputes', [App\Http\Controllers\Admin\DisputeController::class, 'index'])->name('admin.disputes.index');
+    Route::get('/disputes/{return}', [App\Http\Controllers\Admin\DisputeController::class, 'show'])->name('admin.disputes.show');
+    Route::post('/disputes/{return}/status', [App\Http\Controllers\Admin\DisputeController::class, 'updateStatus'])->name('admin.disputes.update-status');
+    Route::post('/disputes/{return}/resolve', [App\Http\Controllers\Admin\DisputeController::class, 'resolve'])->name('admin.disputes.resolve');
 
 });
 
@@ -230,6 +235,12 @@ Route::post('/products/{product}/review', [App\Http\Controllers\ProductReviewCon
 // Order Returns (Customer)
 Route::post('/orders/{order}/return', [App\Http\Controllers\OrderReturnController::class, 'store'])->name('orders.return.store')->middleware('auth');
 Route::post('/orders/{order}/claim-refund', [App\Http\Controllers\OrderReturnController::class, 'claimRefund'])->name('orders.claim-refund')->middleware('auth');
+
+// Dispute/Return Tracking (Buyer)
+Route::middleware('auth')->group(function () {
+    Route::get('disputes', [App\Http\Controllers\OrderReturnController::class, 'index'])->name('disputes.index');
+    Route::get('disputes/{return}', [App\Http\Controllers\OrderReturnController::class, 'show'])->name('disputes.show');
+});
 
 
 

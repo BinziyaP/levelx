@@ -1,0 +1,5 @@
+
+   INFO  Running migrations.  
+
+  2026_02_19_155600_create_disputes_tables  958ms DONE
+

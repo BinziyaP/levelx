@@ -189,7 +189,7 @@ class OrderController extends Controller
 
     public function index()
     {
-        $orders = \App\Models\Order::where('user_id', auth()->id())->latest()->get();
+        $orders = \App\Models\Order::where('user_id', auth()->id())->with('returnRequest')->latest()->get();
         return view('orders.index', compact('orders'));
     }
 

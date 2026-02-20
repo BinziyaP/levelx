@@ -1,0 +1,69 @@
+
+   INFO  Running migrations.  
+
+  2026_02_17_170613_add_pricing_columns_to_orders_table   
+  ??? alter table `orders` add `original_price` decimal(10, 2) null after `total_price`, add `discount_amount` decimal(10, 2) not null default '0' after `original_price`  
+  2026_02_17_213000_add_quantity_to_products_table   
+  ??? alter table `products` add `quantity` int not null default '0' after `price`  
+  2026_02_17_224347_update_bundle_rules_structure   
+  ??? select column_name as `column_name` from information_schema.columns where table_schema = ? and table_name =  
+  ??? select column_name as `column_name` from information_schema.columns where table_schema = ? and table_name =  
+  ??? alter table `bundle_rules` add `discount_type` varchar(255) not null default 'percentage' after `discount_percentage`, add `discount_value` decimal(10, 2) null after `discount_type`  
+  2026_02_18_105004_add_ranking_columns_to_products_table   
+  ??? select column_name as `column_name` from information_schema.columns where table_schema = ? and table_name =  
+  ??? alter table `products` add `total_sales` int not null default '0', add `avg_rating` decimal(3, 2) not null default '0', add `return_rate` decimal(5, 2) not null default '0', add `ranking_score` decimal(10, 2) not null default '0'  
+  2026_02_18_105004_create_ranking_settings_table   
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  ??? create table `ranking_settings` (`id` bigint unsigned not null auto_increment primary key, `sales_weight` decimal(8, 4) not null default '1', `rating_weight` decimal(8, 4) not null default '1', `return_weight` decimal(8, 4) not null default '1', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? insert into `ranking_settings` (`sales_weight`, `rating_weight`, `return_weight`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?)  
+  2026_02_18_114000_create_best_seller_and_analytics_tables   
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  ??? create table `product_reviews` (`id` bigint unsigned not null auto_increment primary key, `product_id` bigint unsigned not null, `user_id` bigint unsigned not null, `rating` int unsigned not null, `review_text` text null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? alter table `product_reviews` add constraint `product_reviews_product_id_foreign` foreign key (`product_id`) references `products` (`id`) on delete cascade  
+  ??? alter table `product_reviews` add constraint `product_reviews_user_id_foreign` foreign key (`user_id`) references `users` (`id`) on delete cascade  
+  ??? alter table `product_reviews` add unique `product_reviews_user_id_product_id_unique`(`user_id`, `product_id`)  
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  ??? create table `order_returns` (`id` bigint unsigned not null auto_increment primary key, `order_id` bigint unsigned not null, `status` varchar(255) not null default 'pending', `reason` text not null, `refund_amount` decimal(10, 2) null, `razorpay_refund_id` varchar(255) null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? alter table `order_returns` add constraint `order_returns_order_id_foreign` foreign key (`order_id`) references `orders` (`id`) on delete cascade  
+  ??? alter table `order_returns` add index `order_returns_status_index`(`status`)  
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  ??? create table `product_sales_history` (`id` bigint unsigned not null auto_increment primary key, `product_id` bigint unsigned not null, `quantity` int not null, `revenue` decimal(10, 2) not null, `recorded_at` timestamp default CURRENT_TIMESTAMP not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? alter table `product_sales_history` add constraint `product_sales_history_product_id_foreign` foreign key (`product_id`) references `products` (`id`) on delete cascade  
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  ??? create table `product_rating_history` (`id` bigint unsigned not null auto_increment primary key, `product_id` bigint unsigned not null, `average_rating` decimal(3, 2) not null, `total_reviews` int not null, `recorded_at` timestamp default CURRENT_TIMESTAMP not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? alter table `product_rating_history` add constraint `product_rating_history_product_id_foreign` foreign key (`product_id`) references `products` (`id`) on delete cascade  
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  2026_02_18_120000_ensure_best_seller_tables   
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  ??? create table `product_reviews` (`id` bigint unsigned not null auto_increment primary key, `product_id` bigint unsigned not null, `user_id` bigint unsigned not null, `rating` int unsigned not null, `review_text` text null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? alter table `product_reviews` add constraint `product_reviews_product_id_foreign` foreign key (`product_id`) references `products` (`id`) on delete cascade  
+  ??? alter table `product_reviews` add constraint `product_reviews_user_id_foreign` foreign key (`user_id`) references `users` (`id`) on delete cascade  
+  ??? alter table `product_reviews` add unique `product_reviews_user_id_product_id_unique`(`user_id`, `product_id`)  
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  ??? create table `order_returns` (`id` bigint unsigned not null auto_increment primary key, `order_id` bigint unsigned not null, `status` varchar(255) not null default 'pending', `reason` text not null, `refund_amount` decimal(10, 2) null, `razorpay_refund_id` varchar(255) null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? alter table `order_returns` add constraint `order_returns_order_id_foreign` foreign key (`order_id`) references `orders` (`id`) on delete cascade  
+  ??? alter table `order_returns` add index `order_returns_status_index`(`status`)  
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  ??? create table `product_sales_history` (`id` bigint unsigned not null auto_increment primary key, `product_id` bigint unsigned not null, `quantity` int not null, `revenue` decimal(10, 2) not null, `recorded_at` timestamp default CURRENT_TIMESTAMP not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? alter table `product_sales_history` add constraint `product_sales_history_product_id_foreign` foreign key (`product_id`) references `products` (`id`) on delete cascade  
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  ??? create table `product_rating_history` (`id` bigint unsigned not null auto_increment primary key, `product_id` bigint unsigned not null, `average_rating` decimal(3, 2) not null, `total_reviews` int not null, `recorded_at` timestamp default CURRENT_TIMESTAMP not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? alter table `product_rating_history` add constraint `product_rating_history_product_id_foreign` foreign key (`product_id`) references `products` (`id`) on delete cascade  
+  ??? select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'  
+  2026_02_18_123000_add_early_reviews_to_settings   
+  ??? select column_name as `column_name` from information_schema.columns where table_schema = ? and table_name =  
+  ??? alter table `ranking_settings` add `allow_early_reviews` tinyint(1) not null default '0'  
+  2026_02_19_155600_create_disputes_tables   
+  ??? create table `disputes` (`id` bigint unsigned not null auto_increment primary key, `order_id` bigint unsigned not null, `buyer_id` bigint unsigned not null, `seller_id` bigint unsigned not null, `reason` text not null, `description` text not null, `status` enum('pending', 'under_review', 'resolved', 'rejected') not null default 'pending', `resolution_type` enum('full_refund', 'partial_refund', 'no_refund') null, `refund_amount` decimal(10, 2) null, `resolved_by` bigint unsigned null, `resolved_at` timestamp null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? alter table `disputes` add constraint `disputes_order_id_foreign` foreign key (`order_id`) references `orders` (`id`) on delete cascade  
+  ??? alter table `disputes` add constraint `disputes_buyer_id_foreign` foreign key (`buyer_id`) references `users` (`id`) on delete cascade  
+  ??? alter table `disputes` add constraint `disputes_seller_id_foreign` foreign key (`seller_id`) references `users` (`id`) on delete cascade  
+  ??? alter table `disputes` add constraint `disputes_resolved_by_foreign` foreign key (`resolved_by`) references `users` (`id`) on delete set null  
+  ??? create table `dispute_evidences` (`id` bigint unsigned not null auto_increment primary key, `dispute_id` bigint unsigned not null, `file_path` varchar(255) not null, `file_type` varchar(255) not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? alter table `dispute_evidences` add constraint `dispute_evidences_dispute_id_foreign` foreign key (`dispute_id`) references `disputes` (`id`) on delete cascade  
+  ??? create table `dispute_logs` (`id` bigint unsigned not null auto_increment primary key, `dispute_id` bigint unsigned not null, `old_status` varchar(255) null, `new_status` varchar(255) not null, `changed_by` bigint unsigned null, `note` text null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'  
+  ??? alter table `dispute_logs` add constraint `dispute_logs_dispute_id_foreign` foreign key (`dispute_id`) references `disputes` (`id`) on delete cascade  
+  ??? alter table `dispute_logs` add constraint `dispute_logs_changed_by_foreign` foreign key (`changed_by`) references `users` (`id`) on delete set null  
+

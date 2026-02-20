@@ -14,8 +14,12 @@ return new class extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->decimal('original_price', 10, 2)->after('total_price')->nullable();
-            $table->decimal('discount_amount', 10, 2)->after('original_price')->default(0);
+            if (!Schema::hasColumn('orders', 'original_price')) {
+                $table->decimal('original_price', 10, 2)->after('total_price')->nullable();
+            }
+            if (!Schema::hasColumn('orders', 'discount_amount')) {
+                $table->decimal('discount_amount', 10, 2)->after('original_price')->default(0);
+            }
         });
     }
 

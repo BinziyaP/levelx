@@ -41,6 +41,9 @@
                             {{ auth()->user()->unreadNotifications->count() ?? 0 }}
                         </span>
                     </a>
+                    <x-nav-link :href="route('seller.returns.index')" :active="request()->routeIs('seller.returns.*')" class="flex items-center px-4 py-2 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900 rounded-md">
+                        🔄 Returns
+                    </x-nav-link>
                 </nav>
                 <div class="p-4 border-t border-gray-200 dark:border-gray-700">
                     <form method="POST" action="{{ route('logout') }}">

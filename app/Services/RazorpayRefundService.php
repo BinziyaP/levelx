@@ -19,14 +19,14 @@ class RazorpayRefundService
     public function processRefund(OrderReturn $return)
     {
         // 1. Idempotency Check
-        if ($return->status === 'refunded' || $return->razorpay_refund_id) {
+        if ($return->razorpay_refund_id) {
             Log::info("Refund already processed for Return ID: {$return->id}");
             return true;
         }
 
         // 2. Validate State
-        if ($return->status !== 'approved') {
-            throw new \Exception("Return request must be approved before refunding.");
+        if ($return->status !== 'approved' && $return->status !== 'resolved') {
+            throw new \Exception("Return request must be approved or resolved before refunding.");
         }
 
         $paymentId = $return->order->payment_id; 
@@ -47,14 +47,13 @@ class RazorpayRefundService
                 ];
 
                 if ($return->refund_amount) {
-                    $refundData['amount'] = $return->refund_amount * 100; // Razorpay expects paise
+                    $refundData['amount'] = (int)round($return->refund_amount * 100); // Razorpay expects paise as integer
                 }
 
                 $refund = $this->api->refund->create($refundData);
 
                 // 4. Update Database
                 $return->update([
-                    'status' => 'refunded',
                     'razorpay_refund_id' => $refund->id,
                     'updated_at' => now()
                 ]);

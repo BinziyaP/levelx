@@ -1,0 +1,127 @@
+
+   INFO  Running migrations.  
+
+  2026_02_17_170613_add_pricing_columns_to_orders_table  3ms FAIL
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'original_price' (SQL: alter table `orders` add `original_price` decimal(10, 2) null after `total_price`, add `discount_amount` decimal(10, 2) not null default '0' after `original_price`)
+
+  at C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:760
+    756???         // If an exception occurs when attempting to run a query, we'll format the error
+    757???         // message to include the bindings with SQL, which will make this exception a
+    758???         // lot more helpful to the developer instead of just the database's errors.
+    759???         catch (Exception $e) {
+  ??? 760???             throw new QueryException(
+    761???                 $query, $this->prepareBindings($bindings), $e
+    762???             );
+    763???         }
+    764???     }
+
+  1   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:545
+      PDOException::("SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'original_price'")
+
+  2   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:545
+      PDOStatement::execute()
+
+  3   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:753
+      Illuminate\Database\Connection::Illuminate\Database\{closure}("alter table `orders` add `original_price` decimal(10, 2) null after `total_price`, add `discount_amount` decimal(10, 2) not null default '0' after `original_price`", [])
+
+  4   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:720
+      Illuminate\Database\Connection::runQueryCallback("alter table `orders` add `original_price` decimal(10, 2) null after `total_price`, add `discount_amount` decimal(10, 2) not null default '0' after `original_price`", [], Object(Closure))
+
+  5   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:546
+      Illuminate\Database\Connection::run("alter table `orders` add `original_price` decimal(10, 2) null after `total_price`, add `discount_amount` decimal(10, 2) not null default '0' after `original_price`", [], Object(Closure))
+
+  6   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Schema\Blueprint.php:109
+      Illuminate\Database\Connection::statement("alter table `orders` add `original_price` decimal(10, 2) null after `total_price`, add `discount_amount` decimal(10, 2) not null default '0' after `original_price`")
+
+  7   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Schema\Builder.php:439
+      Illuminate\Database\Schema\Blueprint::build(Object(Illuminate\Database\MySqlConnection), Object(Illuminate\Database\Schema\Grammars\MySqlGrammar))
+
+  8   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Schema\Builder.php:269
+      Illuminate\Database\Schema\Builder::build(Object(Illuminate\Database\Schema\Blueprint))
+
+  9   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:338
+      Illuminate\Database\Schema\Builder::table("orders", Object(Closure))
+
+  10  C:\Users\binziya\myproject\database\migrations\2026_02_17_170613_add_pricing_columns_to_orders_table.php:19
+      Illuminate\Support\Facades\Facade::__callStatic("table")
+
+  11  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:496
+      Illuminate\Database\Migrations\Migration@anonymous\C:\Users\binziya\myproject\database\migrations\2026_02_17_170613_add_pricing_columns_to_orders_table.php:7$652::up()
+
+  12  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:414
+      Illuminate\Database\Migrations\Migrator::runMethod(Object(Illuminate\Database\MySqlConnection), Object(Illuminate\Database\Migrations\Migration@anonymous\C:\Users\binziya\myproject\database\migrations\2026_02_17_170613_add_pricing_columns_to_orders_table.php:7$652), "up")
+
+  13  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:423
+      Illuminate\Database\Migrations\Migrator::Illuminate\Database\Migrations\{closure}()
+
+  14  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:224
+      Illuminate\Database\Migrations\Migrator::runMigration(Object(Illuminate\Database\Migrations\Migration@anonymous\C:\Users\binziya\myproject\database\migrations\2026_02_17_170613_add_pricing_columns_to_orders_table.php:7$652), "up")
+
+  15  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Console\View\Components\Task.php:37
+      Illuminate\Database\Migrations\Migrator::Illuminate\Database\Migrations\{closure}()
+
+  16  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:778
+      Illuminate\Console\View\Components\Task::render("2026_02_17_170613_add_pricing_columns_to_orders_table", Object(Closure))
+
+  17  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:224
+      Illuminate\Database\Migrations\Migrator::write("Illuminate\Console\View\Components\Task", "2026_02_17_170613_add_pricing_columns_to_orders_table", Object(Closure))
+
+  18  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:189
+      Illuminate\Database\Migrations\Migrator::runUp("C:\Users\binziya\myproject\database\migrations/2026_02_17_170613_add_pricing_columns_to_orders_table.php")
+
+  19  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:132
+      Illuminate\Database\Migrations\Migrator::runPending([])
+
+  20  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Console\Migrations\MigrateCommand.php:90
+      Illuminate\Database\Migrations\Migrator::run([])
+
+  21  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:636
+      Illuminate\Database\Console\Migrations\MigrateCommand::Illuminate\Database\Console\Migrations\{closure}()
+
+  22  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Console\Migrations\MigrateCommand.php:102
+      Illuminate\Database\Migrations\Migrator::usingConnection(Object(Closure))
+
+  23  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+      Illuminate\Database\Console\Migrations\MigrateCommand::handle()
+
+  24  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Container\Util.php:41
+      Illuminate\Container\BoundMethod::Illuminate\Container\{closure}()
+
+  25  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:93
+      Illuminate\Container\Util::unwrapIfClosure(Object(Closure))
+
+  26  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:37
+      Illuminate\Container\BoundMethod::callBoundMethod(Object(Illuminate\Foundation\Application), Object(Closure))
+
+  27  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Container\Container.php:661
+      Illuminate\Container\BoundMethod::call(Object(Illuminate\Foundation\Application), [])
+
+  28  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Console\Command.php:183
+      Illuminate\Container\Container::call()
+
+  29  C:\Users\binziya\myproject\vendor\symfony\console\Command\Command.php:291
+      Illuminate\Console\Command::execute(Object(Symfony\Component\Console\Input\ArgvInput), Object(Illuminate\Console\OutputStyle))
+
+  30  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Console\Command.php:153
+      Symfony\Component\Console\Command\Command::run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Illuminate\Console\OutputStyle))
+
+  31  C:\Users\binziya\myproject\vendor\symfony\console\Application.php:1014
+      Illuminate\Console\Command::run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  32  C:\Users\binziya\myproject\vendor\symfony\console\Application.php:301
+      Symfony\Component\Console\Application::doRunCommand(Object(Illuminate\Database\Console\Migrations\MigrateCommand), Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  33  C:\Users\binziya\myproject\vendor\symfony\console\Application.php:171
+      Symfony\Component\Console\Application::doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  34  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Console\Application.php:102
+      Symfony\Component\Console\Application::run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  35  C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Foundation\Console\Kernel.php:155
+      Illuminate\Console\Application::run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  36  C:\Users\binziya\myproject\artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))

@@ -1,0 +1,14 @@
+
+  GET|HEAD   admin/disputes admin.disputes.index ??? Admin\DisputeControl???
+  GET|HEAD   admin/disputes/{id} admin.disputes.show ??? Admin\DisputeC???
+  POST       admin/disputes/{id}/resolve admin.disputes.resolve ??? Admin\Dis???
+  POST       admin/disputes/{id}/status admin.disputes.update-status ??? Admin\DisputeCo???
+  GET|HEAD   disputes disputes.index ??? Buyer\DisputeController@in???
+  GET|HEAD   orders/{order}/dispute disputes.create ??? Buyer\Dispute???
+  POST       orders/{order}/dispute disputes.store ??? Buyer\Disput???
+  GET|HEAD   seller/disputes seller.disputes.index ??? Seller\DisputeContro???
+  GET|HEAD   seller/disputes/{id} seller.disputes.show ??? Seller\Dispute???
+  POST       seller/disputes/{id}/respond seller.disputes.respond ??? Seller\Di???
+
+ Showing [10] routes
+

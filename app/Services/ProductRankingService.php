@@ -19,10 +19,12 @@ class ProductRankingService
      * 'delivered' / 'shipped' / 'packed' = fulfillment stages
      * 'returned' = was sold then returned (counts as sale AND return)
      */
+    /**
+     * Valid order statuses that count as a completed sale.
+     * We exclude cancelled and requested statuses as per requirements.
+     */
     private $validSaleStatuses = [
-        'paid', 'approved', 'delivered', 'shipped', 'packed', 'returned',
-        'processing', 'completed',
-        'return_requested', 'cancellation_requested', 'cancelled'
+        'paid', 'approved', 'processing', 'packed', 'shipped', 'delivered', 'completed'
     ];
 
     public function __construct()
@@ -65,27 +67,31 @@ class ProductRankingService
     }
 
     /**
-     * Check if an order is a return.
-     * Checks order status AND the order_returns table for approved returns.
+     * Calculate return ratio for an order.
+     * Returns a float between 0 and 1.
      */
-    private function isOrderReturned($order)
+    private function getReturnRatio($order)
     {
-        // Check order status for any return/cancel-related status
-        $returnStatuses = ['returned', 'return_requested', 'cancelled', 'cancellation_requested'];
-        if (in_array($order->status, $returnStatuses)) {
-            return true;
+        $returnRequest = $order->returnRequest;
+        
+        // A return only affects ranking if it is 'resolved' 
+        // AND has a resolution type of 'full_refund' or 'partial_refund'
+        if (!$returnRequest || $returnRequest->status !== 'resolved') {
+            return 0;
         }
 
-        if (($order->shipping_status ?? null) === 'returned') {
-            return true;
+        if (!in_array($returnRequest->resolution_type, ['full_refund', 'partial_refund'])) {
+            return 0;
         }
 
-        // Also check if there's an approved return request in the order_returns table
-        $hasApprovedReturn = \App\Models\OrderReturn::where('order_id', $order->id)
-            ->whereIn('status', ['approved', 'refunded'])
-            ->exists();
+        // Weighted return impact: refund_amount / total_price
+        $total = (float) $order->total_price;
+        if ($total <= 0) return 1;
 
-        return $hasApprovedReturn;
+        $refund = (float) $returnRequest->refund_amount;
+        $ratio = $refund / $total;
+
+        return min(max($ratio, 0), 1);
     }
 
     public function updateProductStats($productId)
@@ -96,34 +102,38 @@ class ProductRankingService
         }
 
         // Calculate Total Sales and Returns from orders
+        // Use eager loading for returnRequest and filter orders for performance
         $sales = 0;
         $returns = 0;
 
-        $orders = Order::all();
+        // Optimization: Instead of Order::all(), we fetch orders in chunks with eager loading
+        Order::with('returnRequest')->chunk(200, function ($orders) use ($product, &$sales, &$returns) {
+            foreach ($orders as $order) {
+                if (!$this->isOrderASale($order)) {
+                    continue;
+                }
 
-        foreach ($orders as $order) {
-            if (!$this->isOrderASale($order)) {
-                continue;
-            }
+                $items = $order->items;
+                if (is_string($items)) {
+                    $items = json_decode($items, true);
+                }
+                if (!is_array($items)) continue;
 
-            $items = $order->items;
-            if (is_string($items)) {
-                $items = json_decode($items, true);
-            }
-            if (!is_array($items)) continue;
+                $returnRatio = $this->getReturnRatio($order);
 
-            foreach ($items as $key => $item) {
-                $itemId = $item['product_id'] ?? $item['id'] ?? $key;
-                if ($itemId == $product->id) {
-                    $qty = isset($item['quantity']) ? (int)$item['quantity'] : 1;
-                    $sales += $qty;
+                foreach ($items as $key => $item) {
+                    $itemId = $item['product_id'] ?? $item['id'] ?? $key;
+                    if ($itemId == $product->id) {
+                        $qty = isset($item['quantity']) ? (int)$item['quantity'] : 1;
+                        $sales += $qty;
 
-                    if ($this->isOrderReturned($order)) {
-                        $returns += $qty;
+                        if ($returnRatio > 0) {
+                            $returns += ($qty * $returnRatio);
+                        }
                     }
                 }
             }
-        }
+        });
 
         // Use the ACTUAL average_rating from the product (set by HandleReviewSubmission)
         $avgRating = (float) ($product->average_rating ?? $product->avg_rating ?? 0);
@@ -152,13 +162,14 @@ class ProductRankingService
         // STEP 1: Aggregate sales/returns from ALL orders in one pass
         $stats = []; // product_id => ['sales' => 0, 'returns' => 0]
 
-        Order::chunk(100, function ($orders) use (&$stats) {
+        // Optimization: Eager load returnRequest to avoid duplicate queries
+        Order::with('returnRequest')->chunk(200, function ($orders) use (&$stats) {
             foreach ($orders as $order) {
                 if (!$this->isOrderASale($order)) {
                     continue;
                 }
 
-                $isReturned = $this->isOrderReturned($order);
+                $returnRatio = $this->getReturnRatio($order);
 
                 $items = $order->items;
                 if (is_string($items)) $items = json_decode($items, true);
@@ -175,18 +186,17 @@ class ProductRankingService
                     }
 
                     $stats[$pid]['sales'] += $qty;
-                    if ($isReturned) {
-                        $stats[$pid]['returns'] += $qty;
+                    if ($returnRatio > 0) {
+                        $stats[$pid]['returns'] += ($qty * $returnRatio);
                     }
                 }
             }
         });
 
         // STEP 2: Loop ALL products in chunks to update ranking_score
-        // This ensures products with reviews but no sales are also updated
         $updated = 0;
 
-        Product::chunk(100, function ($products) use ($stats, &$updated) {
+        Product::chunk(200, function ($products) use ($stats, &$updated) {
             foreach ($products as $product) {
                 $sales = 0;
                 $returns = 0;

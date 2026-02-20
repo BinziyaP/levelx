@@ -14,7 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->integer('quantity')->default(0)->after('price');
+            if (!Schema::hasColumn('products', 'quantity')) {
+                $table->integer('quantity')->default(0)->after('price');
+            }
         });
     }
 

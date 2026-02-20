@@ -5,114 +5,102 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderReturn;
 use App\Services\RazorpayRefundService;
+use App\Services\ReturnService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OrderReturnController extends Controller
 {
+    protected $returnService;
+
+    public function __construct(ReturnService $returnService)
+    {
+        $this->returnService = $returnService;
+    }
+
+    /**
+     * List buyer's return requests/disputes.
+     */
+    public function index()
+    {
+        $returns = OrderReturn::with(['order', 'logs'])
+            ->whereHas('order', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
+            ->latest()
+            ->paginate(15);
+
+        return view('disputes.index', compact('returns'));
+    }
+
+    /**
+     * Show buyer's specific dispute detail.
+     */
+    public function show(OrderReturn $return)
+    {
+        if ($return->order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $return->load(['order', 'evidences', 'logs.changer']);
+        return view('disputes.show', compact('return'));
+    }
+
+    /**
+     * Store a new dispute/return request.
+     */
     public function store(Request $request, Order $order)
     {
         // 1. Authorization
-        if ($order->user_id !== Auth::id()) {
+        if ($order->user_id !== auth()->id()) {
             abort(403);
         }
 
         // 2. Validation
         $request->validate([
-            'reason' => 'required|string|max:500',
-            'custom_reason' => 'nullable|string|max:500',
+            'reason_dropdown' => 'required|string',
+            'evidences' => 'required|array|min:1',
+            'evidences.*' => 'required|image|max:5120', // 5MB limit
         ]);
 
-        // Use custom reason if "other" was selected
-        $reason = $request->reason === 'other' ? $request->custom_reason : $request->reason;
-        
-        if (empty($reason)) {
-            return back()->with('error', 'Please provide a reason.');
-        }
+        $reason = $request->reason_dropdown;
 
-        // 3. Status Check - Allow cancel for pending, return for delivered
-        if (!in_array($order->status, ['pending', 'paid']) && $order->shipping_status !== 'delivered') {
-            return back()->with('error', 'This order cannot be cancelled or returned at this time.');
-        }
-
-        // 4. Create Return Request
-        OrderReturn::create([
-            'order_id' => $order->id,
-            'status' => 'pending',
-            'reason' => $reason,
-            'refund_amount' => $order->total_amount ?? $order->total_price,
-        ]);
-
-        // 5. Update order status based on context
-        if ($order->shipping_status === 'delivered') {
-            $order->update(['status' => 'return_requested']);
-        } else {
-            $order->update(['status' => 'cancellation_requested']);
-        }
-
-        // 6. Recalculate ranking for products in this order
         try {
-            $rankingService = app(\App\Services\ProductRankingService::class);
-            $items = is_string($order->items) ? json_decode($order->items, true) : $order->items;
-            if (is_array($items)) {
-                foreach ($items as $key => $item) {
-                    $pid = $item['product_id'] ?? $item['id'] ?? $key;
-                    if ($pid) $rankingService->updateProductStats($pid);
-                }
-            }
-        } catch (\Exception $e) {
-            \Log::error('Ranking update on return error: ' . $e->getMessage());
-        }
+            // 3. Delegation to Service
+            $this->returnService->createDispute($order, [
+                'reason' => $reason,
+            ], $request->file('evidences') ?? []);
 
-        if ($order->shipping_status === 'delivered') {
-            return back()->with('success', 'Return request submitted successfully. We will process it shortly.');
-        } else {
-            return back()->with('success', 'Cancellation request submitted successfully.');
+            return redirect()->route('disputes.index')->with('success', 'Dispute case opened successfully. Our team will review it shortly.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
     }
 
     /**
-     * Customer claims their refund after admin approval.
+     * Customer claims their approved refund.
      */
-    public function claimRefund(Order $order)
+    public function claimRefund(Request $request, Order $order)
     {
-        // 1. Authorization
-        if ($order->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $return = $order->returnRequest;
 
-        // 2. Check return request is approved
-        $returnRequest = $order->returnRequest;
-        if (!$returnRequest || $returnRequest->status !== 'approved') {
-            return back()->with('error', 'No approved refund available for this order.');
+        if (!$return || $order->user_id !== auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized or invalid request.'], 403);
         }
 
         try {
-            // 3. Process refund via Razorpay
-            $refundService = new RazorpayRefundService();
-            $refundService->processRefund($returnRequest);
-
-            // 4. Update order status
-            $order->update(['status' => 'cancelled']);
-
-            // 5. Recalculate ranking for products in this order
-            try {
-                $rankingService = app(\App\Services\ProductRankingService::class);
-                $items = is_string($order->items) ? json_decode($order->items, true) : $order->items;
-                if (is_array($items)) {
-                    foreach ($items as $key => $item) {
-                        $pid = $item['product_id'] ?? $item['id'] ?? $key;
-                        if ($pid) $rankingService->updateProductStats($pid);
-                    }
-                }
-            } catch (\Exception $e) {
-                \Log::error('Ranking update on refund error: ' . $e->getMessage());
-            }
-
-            return back()->with('success', 'Refund of ₹' . number_format($returnRequest->refund_amount, 2) . ' processed successfully! It will reflect in your account within 5-7 business days.');
-
+            $this->returnService->claimRefund($return);
+            return response()->json([
+                'success' => true,
+                'message' => 'Refund processed successfully! The amount will be credited back to your original payment method.',
+                'refund_id' => $return->razorpay_refund_id
+            ]);
         } catch (\Exception $e) {
-            return back()->with('error', 'Refund failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error("Claim Refund Error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process refund: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

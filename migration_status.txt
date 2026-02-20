@@ -1,0 +1,34 @@
+
+  Migration name  Batch / Status  
+  2014_10_12_000000_create_users_table  [1] Ran  
+  2014_10_12_100000_create_password_resets_table  [1] Ran  
+  2019_08_19_000000_create_failed_jobs_table  [1] Ran  
+  2019_12_14_000001_create_personal_access_tokens_table  [1] Ran  
+  2026_02_14_072756_add_role_to_users_table  [1] Ran  
+  2026_02_14_073050_create_products_table  [1] Ran  
+  2026_02_14_084703_add_status_to_products_table  [1] Ran  
+  2026_02_14_090550_create_orders_table  [1] Ran  
+  2026_02_14_092634_create_wishlists_table  [1] Ran  
+  2026_02_14_092706_add_image_to_products_table  [1] Ran  
+  2026_02_14_093149_add_status_to_users_table  [1] Ran  
+  2026_02_15_132600_add_payment_id_to_orders_table  [1] Ran  
+  2026_02_15_155602_create_notifications_table  [1] Ran  
+  2026_02_15_182414_add_shipping_columns_to_orders_table  [1] Ran  
+  2026_02_16_005027_add_shipping_timestamps_to_orders_table  [1] Ran  
+  2026_02_16_105749_rename_courier_name_to_courier_code_in_orders_table  [1] Ran  
+  2026_02_16_165430_create_categories_table  [1] Ran  
+  2026_02_16_165436_add_category_and_brand_to_products_table  [1] Ran  
+  2026_02_16_213155_create_fraud_detection_tables  [1] Ran  
+  2026_02_17_151759_remove_condition_from_products_table  [3] Ran  
+  2026_02_17_170601_create_cart_snapshots_table  [999] Ran  
+  2026_02_17_170608_create_bundle_rules_table  [2] Ran  
+  2026_02_17_170613_add_pricing_columns_to_orders_table  Pending  
+  2026_02_17_213000_add_quantity_to_products_table  Pending  
+  2026_02_17_224347_update_bundle_rules_structure  Pending  
+  2026_02_18_105004_add_ranking_columns_to_products_table  Pending  
+  2026_02_18_105004_create_ranking_settings_table  Pending  
+  2026_02_18_114000_create_best_seller_and_analytics_tables  Pending  
+  2026_02_18_120000_ensure_best_seller_tables  Pending  
+  2026_02_18_123000_add_early_reviews_to_settings  Pending  
+  2026_02_19_155600_create_disputes_tables  Pending  
+

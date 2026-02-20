@@ -1,0 +1,133 @@
+
+  2026_02_17_170613_add_pr
+icing_columns_to_orders_ta
+ble  7ms FAIL
+  SQLSTATE[42S21]: Column 
+already exists: 1060 
+Duplicate column name 
+'original_price' (SQL: 
+alter table `orders` add 
+`original_price` 
+decimal(10, 2) null after 
+`total_price`, add 
+`discount_amount` 
+decimal(10, 2) not null 
+default '0' after 
+`original_price`)
+    756???         // If 
+an exception occurs when 
+attempting to run a 
+query, we'll format the 
+error
+    758???         // lot 
+more helpful to the 
+developer instead of just 
+the database's errors.
+      PDOException::("SQLS
+TATE[42S21]: Column 
+already exists: 1060 
+Duplicate column name 
+'original_price'")
+      Illuminate\Database\
+Connection::Illuminate\Dat
+abase\{closure}("alter 
+table `orders` add 
+`original_price` 
+decimal(10, 2) null after 
+`total_price`, add 
+`discount_amount` 
+decimal(10, 2) not null 
+default '0' after 
+`original_price`", [])
+      Illuminate\Database\
+Connection::runQueryCallba
+ck("alter table `orders` 
+add `original_price` 
+decimal(10, 2) null after 
+`total_price`, add 
+`discount_amount` 
+decimal(10, 2) not null 
+default '0' after 
+`original_price`", [], 
+Object(Closure))
+      Illuminate\Database\
+Connection::run("alter 
+table `orders` add 
+`original_price` 
+decimal(10, 2) null after 
+`total_price`, add 
+`discount_amount` 
+decimal(10, 2) not null 
+default '0' after 
+`original_price`", [], 
+Object(Closure))
+      Illuminate\Database\
+Connection::statement("alt
+er table `orders` add 
+`original_price` 
+decimal(10, 2) null after 
+`total_price`, add 
+`discount_amount` 
+decimal(10, 2) not null 
+default '0' after 
+`original_price`")
+      Illuminate\Database\
+Schema\Builder::table("ord
+ers", Object(Closure))
+  10  C:\Users\binziya\myp
+roject\database\migrations
+\2026_02_17_170613_add_pri
+cing_columns_to_orders_tab
+le.php:19
+      Illuminate\Support\F
+acades\Facade::__callStati
+c("table")
+      Illuminate\Database\
+Migrations\Migration@anony
+mous\C:\Users\binziya\mypr
+oject\database\migrations\
+2026_02_17_170613_add_pric
+ing_columns_to_orders_tabl
+e.php:7$650::up()
+      Illuminate\Database\
+Migrations\Migrator::runMe
+thod(Object(Illuminate\Dat
+abase\MySqlConnection), Ob
+ject(Illuminate\Database\M
+igrations\Migration@anonym
+ous\C:\Users\binziya\mypro
+ject\database\migrations\2
+026_02_17_170613_add_prici
+ng_columns_to_orders_table
+.php:7$650), "up")
+      Illuminate\Database\
+Migrations\Migrator::runMi
+gration(Object(Illuminate\
+Database\Migrations\Migrat
+ion@anonymous\C:\Users\bin
+ziya\myproject\database\mi
+grations\2026_02_17_170613
+_add_pricing_columns_to_or
+ders_table.php:7$650), 
+"up")
+      Illuminate\Console\V
+iew\Components\Task::rende
+r("2026_02_17_170613_add_p
+ricing_columns_to_orders_t
+able", Object(Closure))
+      Illuminate\Database\
+Migrations\Migrator::write
+("Illuminate\Console\View\
+Components\Task", "2026_02
+_17_170613_add_pricing_col
+umns_to_orders_table", 
+Object(Closure))
+      Illuminate\Database\
+Migrations\Migrator::runUp
+("C:\Users\binziya\myproje
+ct\database\migrations/202
+6_02_17_170613_add_pricing
+_columns_to_orders_table.p
+hp")
+
+

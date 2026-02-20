@@ -47,8 +47,8 @@
                     <a href="{{ route('admin.ranking-settings.index') }}" class="flex items-center px-4 py-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900 rounded-md">
                         📊 Ranking Settings
                     </a>
-                    <a href="{{ route('admin.returns.index') }}" class="flex items-center px-4 py-2 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900 rounded-md">
-                        ↩️ Returns & Refunds
+                    <a href="{{ route('admin.disputes.index') }}" class="flex items-center px-4 py-2 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900 rounded-md font-medium">
+                        🔄 Returns
                     </a>
                 </nav>
                 <div class="p-4 border-t border-gray-200 dark:border-gray-700">

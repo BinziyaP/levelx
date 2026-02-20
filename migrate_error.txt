@@ -1,0 +1,25 @@
+
+   INFO  Running migrations.  
+
+  2026_02_17_170613_add_pricing_columns_to_orders_table  3ms FAIL
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'original_price' (SQL: alter table `orders` add `original_price` decimal(10, 2) null after `total_price`, add `discount_amount` decimal(10, 2) not null default '0' after `original_price`)
+
+  at C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:760
+    756???         // If an exception occurs when attempting to run a query, we'll format the error
+    757???         // message to include the bindings with SQL, which will make this exception a
+    758???         // lot more helpful to the developer instead of just the database's errors.
+    759???         catch (Exception $e) {
+  ??? 760???             throw new QueryException(
+    761???                 $query, $this->prepareBindings($bindings), $e
+    762???             );
+    763???         }
+    764???     }
+
+  1   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:545
+      PDOException::("SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'original_price'")
+
+  2   C:\Users\binziya\myproject\vendor\laravel\framework\src\Illuminate\Database\Connection.php:545
+      PDOStatement::execute()
